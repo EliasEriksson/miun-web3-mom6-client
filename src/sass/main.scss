@@ -1,0 +1,73 @@
+@import "reset";
+@import "colors";
+@import "mixins";
+
+body {
+  font-family: "Open Sans", sans-serif;
+  line-height: 1.5;
+  background-color: $background-color-light;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
+.categories {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
+  width: 100%;
+
+
+  background-color: pink;
+  > * {
+    display: flex;
+    justify-content: center;
+    background-color: aqua;
+    padding: 5px 10px;
+
+  }
+}
+
+#paginator {
+  display: none;
+  //display: flex;
+  justify-content: flex-end;
+  width: 100%;
+
+
+  > div {
+    display: flex;
+    align-items: center;
+
+    > div {
+      margin-right: 1ch;
+    }
+  }
+
+  nav {
+    display: flex;
+    background-color: $foreground-color-light;
+    width: fit-content;
+    height: fit-content;
+    padding: 2px;
+  }
+
+  .current-page {
+    background-color: $background-color-light;
+  }
+
+  ul {
+    display: flex;
+    list-style-type: none;
+    gap: 3px;
+  }
+
+  li {
+    background-color: $foreground-color-light;
+    padding: 5px 8px;
+  }
+}

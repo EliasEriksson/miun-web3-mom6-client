@@ -1,0 +1,23 @@
+@import "mixins";
+
+$background-color-dark: #36393f;
+$darker-background-color-dark: #202225;
+$foreground-color-dark: #18191c;
+$darker-foreground-color-dark: #18191c;
+
+$select-color-dark: #4551c5;
+$error-color-dark: #ed4043;
+$success-color-dark: #32a662;
+$contrast-color-dark: #dcddde;
+
+$weight: 95%; // not lower than 80 or contrast gets really bad
+$background-color-light: invert($background-color-dark, $weight);
+$darker-background-color-light: invert($darker-background-color-dark, $weight);
+$foreground-color-light: invert($foreground-color-dark, $weight);
+$darker-foreground-color-light: invert($darker-foreground-color-dark, $weight);
+
+
+$select-color-light: lighten($select-color-dark, 100 - $weight);
+$error-color-light: lighten($error-color-dark, 100 - $weight);
+$success-color-light: lighten($success-color-dark, 100 - $weight);
+$contrast-color-light: invert($contrast-color-dark, $weight);

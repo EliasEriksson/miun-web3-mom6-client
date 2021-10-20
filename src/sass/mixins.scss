@@ -1,0 +1,11 @@
+@mixin media ($width) {
+  @media screen and (max-width: $width) {
+    @content;
+  }
+}
+
+@mixin darkMode() {
+  @media (prefers-color-scheme: dark) {
+    @content;
+  }
+}

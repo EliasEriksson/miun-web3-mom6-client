@@ -1,38 +1,154 @@
-/**
- * typescript implementation of https://github.com/EliasEriksson/xRender/blob/main/static/js/xRender.js
- *
- * renders a htmlTemplate to HTML
- *
- * all keys in the object are used to replace the {{ variables }} in the template.
- * if a variable is found its replaced with the value for the key in context.
- *
- * if there are still {{ variables }} left in the template after the replacement
- * is done null is returned instead.
- *
- * @param template a HTML file with {{ variables }}
- * @param context originally a JSON object. Must have keys matching each {{ variable }} in the template
- * @returns ChildNode
- */
-export function render(template: string, context: {[key: string]: any}): ChildNode|null {
-    for (let variable in context) {
-        template = template.replace(new RegExp(`{{\\s*${variable}\\s*}}`, "gm"), context[variable]);
+import {render} from "./modules/xrender.js";
+import {requestEndpoint, requestTemplate} from "./modules/requests.js";
+import {ContentType, Endpoint, GetResponse} from "./modules/constants.js";
+
+
+class Loader<T extends ContentType> {
+    private readonly template: string;
+    private readonly endpoint: string;
+    private readonly resultDataElement: HTMLElement;
+
+    private paginatorElement: HTMLElement;
+    private paginatorListElement: HTMLUListElement;
+
+    private courseCount: number;
+    private pageLimit: number;
+    private pageOffset: number;
+
+    constructor(template: string, endpoint: Endpoint, resultDataElement: HTMLElement, paginatorElement: HTMLElement) {
+        console.log(template)
+        this.template = template;
+        this.endpoint = endpoint;
+
+        this.resultDataElement = resultDataElement;
+        this.paginatorElement = paginatorElement;
+        this.paginatorListElement = paginatorElement.querySelector("#paginator-list");
+
+        this.courseCount = 0;
+        this.pageLimit = 10;
+        this.pageOffset = 0;
     }
-    if (template.match(/{{\s*[^}]\s*}}/)) {
-        return null;
+
+    static create = async <T extends ContentType>(
+        templateName: string, endpoint: Endpoint,
+        resultDataElement: HTMLElement, paginatorElement: HTMLElement) => {
+        return new Loader<T>(
+            await requestTemplate(templateName),
+            endpoint, resultDataElement, paginatorElement
+        );
     }
-    const divElement = document.createElement("div");
-    divElement.innerHTML = template;
-    return divElement.firstChild;
+
+    getRequest = async (queryParams: string = "") => {
+        this.resultDataElement.innerHTML = "";
+        this.paginatorElement.style.display = "none";
+        let [response, status] = await requestEndpoint<GetResponse<T>>(
+            `${this.endpoint}/${queryParams}`
+        );
+
+        this.updatePageDetails(response);
+        if (this.courseCount > this.pageLimit) {
+            this.renderPaginator();
+        }
+
+        if (200 <= status && status < 300) {
+            this.renderResponse(response.results);
+        }
+    }
+
+    updatePageDetails = (response: GetResponse<T>) => {
+        this.courseCount = response.count;
+        if (response.next) {
+            let nextURL = new URL(response.next);
+            this.pageLimit = parseInt(nextURL.searchParams.get("limit"));
+            // current offset must be 'limit' less than next
+            this.pageOffset = parseInt(nextURL.searchParams.get("offset")) - this.pageLimit;
+        } else if (response.previous) {
+            let previousURL = new URL(response.previous);
+            this.pageLimit = parseInt(previousURL.searchParams.get("limit"));
+            // if a previous link exist the current offset is 'limit' more than that
+            // if the previous link have no offset we are on the last page
+            if (previousURL.searchParams.has("offset")) {
+                this.pageOffset = parseInt(previousURL.searchParams.get("offset")) + this.pageLimit;
+            } else {
+                this.pageOffset = Math.floor(this.courseCount / this.pageLimit) * this.pageLimit;
+            }
+        }
+    }
+
+    renderPaginator = () => {
+        this.paginatorListElement.innerHTML = "";
+        this.paginatorElement.style.display = "flex";
+
+        let pageCount = Math.ceil(this.courseCount / this.pageLimit);
+        let currentPageNumber = this.pageOffset / this.pageLimit;
+        let page: HTMLLIElement;
+
+        const start = Math.max(0, currentPageNumber - 2);
+        const end = Math.min(currentPageNumber + 3, pageCount);
+
+        for (let pageNumber = start; pageNumber < end; pageNumber++) {
+            page = document.createElement("li");
+
+            //if a page on the paginator i clicked a new get request is made.
+            page.addEventListener("click", async () => {
+                await this.getRequest(
+                    `?offset=${this.pageLimit * (pageNumber)}&limit=${this.pageLimit}`
+                );
+            });
+
+            if (pageNumber === currentPageNumber) {
+                page.classList.add("current-page");
+            }
+            page.innerHTML = `${pageNumber + 1}`;
+            this.paginatorListElement.appendChild(page);
+        }
+    }
+
+    renderResponse = (resultContent: T[]) => {
+        let spacer = document.createElement("div");
+        spacer.classList.add("spacer");
+        for (const content of resultContent) {
+            this.resultDataElement.appendChild(spacer.cloneNode());
+            this.resultDataElement.appendChild(render(
+                this.template, content
+            ));
+        }
+    }
 }
 
-/**
- * request file from the template directory.
- *
- * this template will be used with the render function in xrender.ts
- *
- * @param templateName: filename of the template.
- */
-export const requestTemplate = async (templateName: string) => {
-    let response = await fetch(`./templates/${templateName}`);
-    return  await response.text();
-}
+
+window.addEventListener("load", async () => {
+    const courseButtonElement = document.getElementById("courses");
+    const jobButtonElement = document.getElementById("jobs");
+    const websiteButtonElement = document.getElementById("websites");
+
+    let resultDataElement = document.getElementById("list");
+    let paginatorElement = document.getElementById("paginator");
+
+    Loader.create(
+        "course.html", "courses",
+        resultDataElement, paginatorElement
+    ).then(loader => {
+        courseButtonElement.addEventListener("click", () => {
+            loader.getRequest();
+        });
+    });
+
+    Loader.create(
+        "job.html", "jobs",
+        resultDataElement, paginatorElement
+    ).then(loader => {
+        jobButtonElement.addEventListener("click", () => {
+            loader.getRequest();
+        });
+    });
+
+    Loader.create(
+        "website.html", "webpages",
+        resultDataElement, paginatorElement
+    ).then(loader => {
+        websiteButtonElement.addEventListener("click", () => {
+            loader.getRequest();
+        });
+    });
+});
