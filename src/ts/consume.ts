@@ -3,44 +3,38 @@ import {requestEndpoint, requestTemplate} from "./modules/requests.js";
 import {ContentType, Endpoint, GetResponse} from "./modules/constants.js";
 
 
+const courseButtonElement = document.getElementById("courses");
+const jobButtonElement = document.getElementById("jobs");
+const websiteButtonElement = document.getElementById("websites");
+
+const resultDataElement = document.getElementById("list");
+const paginatorElement = document.getElementById("paginator");
+const paginatorListElement = document.getElementById("paginator-list");
+
 class Loader<T extends ContentType> {
     private readonly template: string;
     private readonly endpoint: string;
-    private readonly resultDataElement: HTMLElement;
-
-    private paginatorElement: HTMLElement;
-    private paginatorListElement: HTMLUListElement;
 
     private courseCount: number;
     private pageLimit: number;
     private pageOffset: number;
 
-    constructor(template: string, endpoint: Endpoint, resultDataElement: HTMLElement, paginatorElement: HTMLElement) {
-        console.log(template)
+    constructor(template: string, endpoint: Endpoint) {
         this.template = template;
         this.endpoint = endpoint;
-
-        this.resultDataElement = resultDataElement;
-        this.paginatorElement = paginatorElement;
-        this.paginatorListElement = paginatorElement.querySelector("#paginator-list");
 
         this.courseCount = 0;
         this.pageLimit = 10;
         this.pageOffset = 0;
     }
 
-    static create = async <T extends ContentType>(
-        templateName: string, endpoint: Endpoint,
-        resultDataElement: HTMLElement, paginatorElement: HTMLElement) => {
-        return new Loader<T>(
-            await requestTemplate(templateName),
-            endpoint, resultDataElement, paginatorElement
-        );
+    static create = async <T extends ContentType>(templateName: string, endpoint: Endpoint) => {
+        return new Loader<T>(await requestTemplate(templateName), endpoint);
     }
 
     getRequest = async (queryParams: string = "") => {
-        this.resultDataElement.innerHTML = "";
-        this.paginatorElement.style.display = "none";
+        resultDataElement.innerHTML = "";
+        paginatorElement.style.display = "none";
         let [response, status] = await requestEndpoint<GetResponse<T>>(
             `${this.endpoint}/${queryParams}`
         );
@@ -76,8 +70,8 @@ class Loader<T extends ContentType> {
     }
 
     renderPaginator = () => {
-        this.paginatorListElement.innerHTML = "";
-        this.paginatorElement.style.display = "flex";
+        paginatorListElement.innerHTML = "";
+        paginatorElement.style.display = "flex";
 
         let pageCount = Math.ceil(this.courseCount / this.pageLimit);
         let currentPageNumber = this.pageOffset / this.pageLimit;
@@ -100,7 +94,7 @@ class Loader<T extends ContentType> {
                 page.classList.add("current-page");
             }
             page.innerHTML = `${pageNumber + 1}`;
-            this.paginatorListElement.appendChild(page);
+            paginatorListElement.appendChild(page);
         }
     }
 
@@ -108,8 +102,8 @@ class Loader<T extends ContentType> {
         let spacer = document.createElement("div");
         spacer.classList.add("spacer");
         for (const content of resultContent) {
-            this.resultDataElement.appendChild(spacer.cloneNode());
-            this.resultDataElement.appendChild(render(
+            resultDataElement.appendChild(spacer.cloneNode());
+            resultDataElement.appendChild(render(
                 this.template, content
             ));
         }
@@ -118,16 +112,8 @@ class Loader<T extends ContentType> {
 
 
 window.addEventListener("load", async () => {
-    const courseButtonElement = document.getElementById("courses");
-    const jobButtonElement = document.getElementById("jobs");
-    const websiteButtonElement = document.getElementById("websites");
-
-    let resultDataElement = document.getElementById("list");
-    let paginatorElement = document.getElementById("paginator");
-
     Loader.create(
         "course.html", "courses",
-        resultDataElement, paginatorElement
     ).then(loader => {
         courseButtonElement.addEventListener("click", () => {
             loader.getRequest();
@@ -136,7 +122,6 @@ window.addEventListener("load", async () => {
 
     Loader.create(
         "job.html", "jobs",
-        resultDataElement, paginatorElement
     ).then(loader => {
         jobButtonElement.addEventListener("click", () => {
             loader.getRequest();
@@ -145,7 +130,6 @@ window.addEventListener("load", async () => {
 
     Loader.create(
         "website.html", "webpages",
-        resultDataElement, paginatorElement
     ).then(loader => {
         websiteButtonElement.addEventListener("click", () => {
             loader.getRequest();
