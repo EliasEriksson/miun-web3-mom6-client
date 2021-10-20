@@ -75,25 +75,26 @@ class Loader<T extends ContentType> {
 
         let pageCount = Math.ceil(this.courseCount / this.pageLimit);
         let currentPageNumber = this.pageOffset / this.pageLimit;
-        let page: HTMLLIElement;
 
         const start = Math.max(0, currentPageNumber - 2);
         const end = Math.min(currentPageNumber + 3, pageCount);
 
         for (let pageNumber = start; pageNumber < end; pageNumber++) {
-            page = document.createElement("li");
+            let btn = document.createElement("button");
+            let page = document.createElement("li");
 
             //if a page on the paginator i clicked a new get request is made.
-            page.addEventListener("click", async () => {
+            btn.addEventListener("click", async () => {
                 await this.getRequest(
                     `?offset=${this.pageLimit * (pageNumber)}&limit=${this.pageLimit}`
                 );
             });
 
             if (pageNumber === currentPageNumber) {
-                page.classList.add("current-page");
+                btn.classList.add("current-page");
             }
-            page.innerHTML = `${pageNumber + 1}`;
+            btn.innerHTML = `${pageNumber + 1}`;
+            page.appendChild(btn);
             paginatorListElement.appendChild(page);
         }
     }
