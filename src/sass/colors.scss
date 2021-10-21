@@ -14,8 +14,8 @@ $contrast-color-dark: #dcddde;
 $weight: 95%; // not lower than 80 or contrast gets really bad
 $background-color-light: invert($darker-background-color-dark, $weight);
 $darker-background-color-light: invert($background-color-dark, $weight);
-$foreground-color-light: invert($foreground-color-dark, $weight);
-$darker-foreground-color-light: invert($darker-foreground-color-dark, $weight);
+$foreground-color-light: invert($darker-foreground-color-dark, $weight);
+$darker-foreground-color-light: invert($foreground-color-dark, $weight);
 
 $link-color-light: darken($link-color-dark, (100 - $weight) * 2);
 $select-color-light: lighten($select-color-dark, 100 - $weight);
