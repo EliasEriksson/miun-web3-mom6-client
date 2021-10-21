@@ -7,20 +7,22 @@ const courseButtonElement = document.getElementById("courses");
 const jobButtonElement = document.getElementById("jobs");
 const websiteButtonElement = document.getElementById("websites");
 
-const resultDataElement = document.getElementById("list");
+const tableElement = document.getElementById("table");
 const paginatorElement = document.getElementById("paginator");
 const paginatorListElement = document.getElementById("paginator-list");
 
 class Loader<T extends ContentType> {
-    private readonly template: string;
+    private readonly headingTemplate: string;
+    private readonly dataTemplate: string;
     private readonly endpoint: string;
 
     private courseCount: number;
     private pageLimit: number;
     private pageOffset: number;
 
-    constructor(template: string, endpoint: Endpoint) {
-        this.template = template;
+    constructor(endpoint: Endpoint, headingTemplate: string, dataTemplate: string) {
+        this.headingTemplate = headingTemplate;
+        this.dataTemplate = dataTemplate;
         this.endpoint = endpoint;
 
         this.courseCount = 0;
@@ -28,12 +30,15 @@ class Loader<T extends ContentType> {
         this.pageOffset = 0;
     }
 
-    static create = async <T extends ContentType>(templateName: string, endpoint: Endpoint) => {
-        return new Loader<T>(await requestTemplate(templateName), endpoint);
+    static create = async <T extends ContentType>(endpoint: Endpoint) => {
+        let headingTemplateP = requestTemplate(`${endpoint}-heading.html`);
+        let dataTemplateP = requestTemplate(`${endpoint}.html`);
+
+        return new Loader<T>(endpoint, await headingTemplateP, await dataTemplateP);
     }
 
     getRequest = async (queryParams: string = "") => {
-        resultDataElement.innerHTML = "";
+        tableElement.innerHTML = "";
         paginatorElement.style.display = "none";
         let [response, status] = await requestEndpoint<GetResponse<T>>(
             `${this.endpoint}/${queryParams}`
@@ -100,12 +105,19 @@ class Loader<T extends ContentType> {
     }
 
     renderResponse = (resultContent: T[]) => {
+        tableElement.className = "";
+        tableElement.classList.add("table");
+        tableElement.classList.add(this.endpoint);
+        tableElement.appendChild(render(
+            this.headingTemplate, {}
+        ));
+
         let spacer = document.createElement("div");
         spacer.classList.add("spacer");
         for (const content of resultContent) {
-            resultDataElement.appendChild(spacer.cloneNode());
-            resultDataElement.appendChild(render(
-                this.template, content
+            tableElement.appendChild(spacer.cloneNode());
+            tableElement.appendChild(render(
+                this.dataTemplate, content
             ));
         }
     }
@@ -114,7 +126,7 @@ class Loader<T extends ContentType> {
 
 window.addEventListener("load", async () => {
     Loader.create(
-        "course.html", "courses",
+        "courses",
     ).then(loader => {
         courseButtonElement.addEventListener("click", () => {
             loader.getRequest();
@@ -122,7 +134,7 @@ window.addEventListener("load", async () => {
     });
 
     Loader.create(
-        "job.html", "jobs",
+        "jobs",
     ).then(loader => {
         jobButtonElement.addEventListener("click", () => {
             loader.getRequest();
@@ -130,7 +142,7 @@ window.addEventListener("load", async () => {
     });
 
     Loader.create(
-        "website.html", "webpages",
+        "webpages",
     ).then(loader => {
         websiteButtonElement.addEventListener("click", () => {
             loader.getRequest();

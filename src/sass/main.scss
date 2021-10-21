@@ -5,7 +5,6 @@
 body {
   font-family: "Open Sans", sans-serif;
   line-height: 1.5;
-  background-color: $background-color-light;
 }
 
 .content {
@@ -16,20 +15,61 @@ body {
 }
 
 
+.width-wrapper {
+  width: 100%;
+  max-width: 960px;
+  padding: 10px;
+}
+
 .categories {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 20px;
+  display: flex;
+  justify-content: space-around;
+  gap: 10px;
   width: 100%;
 
 
-  background-color: pink;
-  > * {
+  button {
     display: flex;
     justify-content: center;
-    background-color: aqua;
-    padding: 5px 10px;
+    padding: 7px 10px;
+    min-width: fit-content;
+    max-width: 250px;
+    width: 100%;
+  }
+}
 
+.table {
+  padding-left: 10px;
+  padding-right: 10px;
+  .table-row {
+    display: grid;
+    gap: 1em;
+  }
+
+  &.courses .table-row {
+    grid-template-columns: 20ch 1fr 15ch 12ch 12ch;
+
+  }
+
+  &.jobs .table-row {
+    grid-template-columns: 2fr 2fr 1fr 1fr;
+  }
+
+  &.webpages .table-row {
+    grid-template-columns: 25ch 1fr 8ch;
+  }
+
+  .spacer {
+    margin: 10px 5px;
+    height: 2px;
+  }
+
+  .table-heading-mobile {
+    display: none;
+  }
+
+  @include media(500px) {
+    display: flex;
   }
 }
 
@@ -42,12 +82,12 @@ footer {
   gap: 10px 20px;
   padding: 10px;
 
-  @include media(500px){
+  @include media(500px) {
     flex-direction: column;
   }
 }
 
-#paginator {
+.paginator {
   display: none;
   //display: flex;
   justify-content: flex-end;
@@ -65,15 +105,13 @@ footer {
 
   nav {
     display: flex;
-    background-color: $foreground-color-light;
     width: fit-content;
     height: fit-content;
-    padding: 2px;
+    padding: 7px;
     border-radius: 10px;
   }
 
   .current-page {
-    background-color: $background-color-light;
     border-radius: 10px;
   }
 
@@ -85,7 +123,6 @@ footer {
 
   button {
     border: none;
-    background-color: $foreground-color-light;
     padding: 5px 8px;
     width: 40px;
     height: 40px;

@@ -16,26 +16,32 @@
 <body>
 <div class="content">
     <h1>Elias Eriksson</h1>
-    <nav class="categories">
-        <div id="jobs">Arbetslivserfarenheter</div>
-        <div id="courses">Utbildning</div>
-        <div id="websites">Projekt</div>
-    </nav>
-    <div id="paginator">
-        <nav>
-            <ul id="paginator-list"></ul>
+    <div class="width-wrapper">
+        <nav class="categories">
+            <button id="jobs">Arbetslivserfarenheter</button>
+            <button id="courses">Utbildning</button>
+            <button id="websites">Projekt</button>
         </nav>
     </div>
-    <main>
-        <div id="list"></div>
-    </main>
+    <div class="width-wrapper">
+        <main>
+            <div id="table" class="table"></div>
+        </main>
+    </div>
+    <div class="width-wrapper">
+        <div id="paginator" class="paginator">
+            <nav>
+                <ul id="paginator-list"></ul>
+            </nav>
+        </div>
+    </div>
 </div>
 <footer>
     <p>Skapad av Elias Eriksson 🄯</p>
     <a href="https://github.com/EliasEriksson/miun-web3-mom6-client/"
     >repo</a>
     <a href="https://miun.eliaseriksson.eu/web3/moment6/admin/"
-    >Admin</a>
+    >admin</a>
 </footer>
 </body>
 </html>

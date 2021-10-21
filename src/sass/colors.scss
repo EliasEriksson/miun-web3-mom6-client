@@ -5,19 +5,107 @@ $darker-background-color-dark: #202225;
 $foreground-color-dark: #18191c;
 $darker-foreground-color-dark: #18191c;
 
+$link-color-dark: #00aff4;
 $select-color-dark: #4551c5;
 $error-color-dark: #ed4043;
 $success-color-dark: #32a662;
 $contrast-color-dark: #dcddde;
 
 $weight: 95%; // not lower than 80 or contrast gets really bad
-$background-color-light: invert($background-color-dark, $weight);
-$darker-background-color-light: invert($darker-background-color-dark, $weight);
+$background-color-light: invert($darker-background-color-dark, $weight);
+$darker-background-color-light: invert($background-color-dark, $weight);
 $foreground-color-light: invert($foreground-color-dark, $weight);
 $darker-foreground-color-light: invert($darker-foreground-color-dark, $weight);
 
-
+$link-color-light: darken($link-color-dark, 100 - $weight);
 $select-color-light: lighten($select-color-dark, 100 - $weight);
 $error-color-light: lighten($error-color-dark, 100 - $weight);
 $success-color-light: lighten($success-color-dark, 100 - $weight);
 $contrast-color-light: invert($contrast-color-dark, $weight);
+
+body {
+  background-color: $background-color-light;
+  color: $contrast-color-light;
+
+  @include darkMode() {
+    background-color: $background-color-dark;
+    color: $contrast-color-dark;
+  }
+}
+
+.categories {
+  button {
+    background-color: $darker-background-color-light;
+    outline: none;
+    border-width: 2px;
+    border-style: solid;
+    border-color: $select-color-light;
+
+    &:active {
+      background-color: darken($darker-background-color-light, 5%);
+      border-top-color: darken($select-color-light, 10%);
+      border-left-color: darken($select-color-light, 10%);
+
+
+      @include darkMode() {
+        background-color: lighten($darker-background-color-dark, 3%);
+        border-top-color: lighten($select-color-dark, 10%);
+        border-left-color: lighten($select-color-dark, 10%);
+      }
+    }
+
+    @include darkMode() {
+      background-color: $darker-background-color-dark;
+      border-color: $select-color-dark;
+      color: $contrast-color-dark;
+    }
+  }
+}
+
+.table {
+  .spacer {
+    background-color: darken($background-color-light, 5%);
+
+    @include darkMode() {
+      background-color: lighten($background-color-dark, 5%);
+    }
+  }
+}
+
+a {
+  color: $link-color-light;
+
+  @include darkMode() {
+    color: $link-color-dark;
+  }
+}
+
+.paginator {
+  nav {
+    background-color: $darker-background-color-light;
+    border: 2px solid $select-color-light;
+
+    @include darkMode() {
+      border-color: $select-color-dark;
+      background-color: $darker-background-color-dark;
+    }
+  }
+  button {
+    background-color: $darker-background-color-light;
+    color: $contrast-color-light;
+
+    @include darkMode() {
+      color: $contrast-color-dark;
+      background-color: $darker-background-color-dark;
+    }
+    &.current-page {
+      background-color: $background-color-light;
+      border: 2px solid $select-color-light;
+
+      @include darkMode() {
+        background-color: $background-color-dark;
+        border: 2px solid $select-color-dark;
+      }
+    }
+  }
+}
