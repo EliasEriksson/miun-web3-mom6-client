@@ -17,7 +17,7 @@ $darker-background-color-light: invert($background-color-dark, $weight);
 $foreground-color-light: invert($foreground-color-dark, $weight);
 $darker-foreground-color-light: invert($darker-foreground-color-dark, $weight);
 
-$link-color-light: darken($link-color-dark, 100 - $weight);
+$link-color-light: darken($link-color-dark, (100 - $weight) * 2);
 $select-color-light: lighten($select-color-dark, 100 - $weight);
 $error-color-light: lighten($error-color-dark, 100 - $weight);
 $success-color-light: lighten($success-color-dark, 100 - $weight);
@@ -107,5 +107,13 @@ a {
         border: 2px solid $select-color-dark;
       }
     }
+  }
+}
+
+footer {
+  background-color: $darker-background-color-light;
+
+  @include darkMode() {
+    background-color: $darker-background-color-dark;
   }
 }
