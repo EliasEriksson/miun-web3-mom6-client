@@ -115,6 +115,9 @@ class Loader<T extends ContentType> {
         let spacer = document.createElement("div");
         spacer.classList.add("spacer");
         for (const content of resultContent) {
+            if (content["endDate"] !== undefined && content["endDate"] === null) {
+                content["endDate"] = "nuvarande";
+            }
             tableElement.appendChild(spacer.cloneNode());
             tableElement.appendChild(render(
                 this.dataTemplate, content
