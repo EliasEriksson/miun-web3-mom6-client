@@ -2,7 +2,7 @@ import {render} from "./modules/xrender.js";
 import {requestEndpoint, requestTemplate} from "./modules/requests.js";
 import {ContentType, Endpoint, GetResponse} from "./modules/constants.js";
 
-
+// references to a few HTML elements
 const courseButtonElement = document.getElementById("courses");
 const jobButtonElement = document.getElementById("jobs");
 const websiteButtonElement = document.getElementById("websites");
@@ -11,6 +11,11 @@ const tableElement = document.getElementById("table");
 const paginatorElement = document.getElementById("paginator");
 const paginatorListElement = document.getElementById("paginator-list");
 
+/**
+ * the loader class
+ *
+ * requests data and renders the data and the paginator to the DOM
+ */
 class Loader<T extends ContentType> {
     private readonly headingTemplate: string;
     private readonly dataTemplate: string;
@@ -30,13 +35,27 @@ class Loader<T extends ContentType> {
         this.pageOffset = 0;
     }
 
+    /**
+     * creates a loader with a specified endpoint
+     *
+     * @param endpoint:
+     */
     static create = async <T extends ContentType>(endpoint: Endpoint) => {
+        // initializes both downloads
         let headingTemplateP = requestTemplate(`${endpoint}-heading.html`);
         let dataTemplateP = requestTemplate(`${endpoint}.html`);
 
+        // wait for both downloads to finish and return a new Loader object
         return new Loader<T>(endpoint, await headingTemplateP, await dataTemplateP);
     }
 
+    /**
+     * requests data from the endpoint and renders the data and a paginator
+     *
+     * queryParams is for internal use only. its used to page the REST service
+     *
+     * @param queryParams:
+     */
     getRequest = async (queryParams: string = "") => {
         tableElement.innerHTML = "";
         paginatorElement.style.display = "none";
@@ -44,16 +63,23 @@ class Loader<T extends ContentType> {
             `${this.endpoint}/${queryParams}`
         );
 
-        this.updatePageDetails(response);
-        if (this.courseCount > this.pageLimit) {
-            this.renderPaginator();
-        }
-
         if (200 <= status && status < 300) {
+            this.updatePageDetails(response);
+
+            // determines if the paginator is needed or not
+            if (this.courseCount > this.pageLimit) {
+                this.renderPaginator();
+            }
+
             this.renderResponse(response.results);
         }
     }
 
+    /**
+     * updates courseCount, PageLimit and pageOffset with data from the response
+     *
+     * @param response
+     */
     updatePageDetails = (response: GetResponse<T>) => {
         this.courseCount = response.count;
         if (response.next) {
@@ -74,6 +100,9 @@ class Loader<T extends ContentType> {
         }
     }
 
+    /**
+     * render the paginator and adds it to the DOM
+     */
     renderPaginator = () => {
         paginatorListElement.innerHTML = "";
         paginatorElement.style.display = "flex";
@@ -104,6 +133,13 @@ class Loader<T extends ContentType> {
         }
     }
 
+    /**
+     * renders the endpoints heading and data to the DOM
+     *
+     * any previous table is cleared first
+     *
+     * @param resultContent
+     */
     renderResponse = (resultContent: T[]) => {
         tableElement.className = "";
         tableElement.classList.add("table");
@@ -115,6 +151,7 @@ class Loader<T extends ContentType> {
         let spacer = document.createElement("div");
         spacer.classList.add("spacer");
         for (const content of resultContent) {
+            // null endDate means current
             if (content["endDate"] !== undefined && content["endDate"] === null) {
                 content["endDate"] = "nuvarande";
             }
@@ -128,6 +165,9 @@ class Loader<T extends ContentType> {
 
 
 window.addEventListener("load", async () => {
+    /**
+     * initializes a loader for each endpoint
+     */
     Loader.create(
         "courses",
     ).then(loader => {

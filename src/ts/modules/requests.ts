@@ -1,4 +1,4 @@
-import {apiURL, ContentType, GetResponse, RequestMethods} from "./constants.js";
+import {apiURL, RequestMethods} from "./constants.js";
 
 /**
  * request file from the template directory.

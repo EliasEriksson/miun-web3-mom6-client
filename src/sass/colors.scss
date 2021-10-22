@@ -1,5 +1,6 @@
 @import "mixins";
 
+// dark colors are defined an light colors are generated from them
 $background-color-dark: #36393f;
 $darker-background-color-dark: #202225;
 $foreground-color-dark: #18191c;
@@ -22,6 +23,10 @@ $select-color-light: lighten($select-color-dark, 100 - $weight);
 $error-color-light: lighten($error-color-dark, 100 - $weight);
 $success-color-light: lighten($success-color-dark, 100 - $weight);
 $contrast-color-light: invert($contrast-color-dark, $weight);
+
+/**
+ * color styling for all elements
+ */
 
 body {
   background-color: $background-color-light;

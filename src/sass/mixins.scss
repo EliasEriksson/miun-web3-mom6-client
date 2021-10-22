@@ -1,3 +1,6 @@
+/**
+ * i prefer writing my media queries this way
+ */
 @mixin media ($width) {
   @media screen and (max-width: $width) {
     @content;
