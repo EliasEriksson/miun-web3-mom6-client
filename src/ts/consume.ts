@@ -31,7 +31,7 @@ class Loader<T extends ContentType> {
         this.endpoint = endpoint;
 
         this.courseCount = 0;
-        this.pageLimit = 10;
+        this.pageLimit = 0;
         this.pageOffset = 0;
     }
 
