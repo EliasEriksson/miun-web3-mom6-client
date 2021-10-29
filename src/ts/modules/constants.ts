@@ -1,4 +1,4 @@
-export const apiURL = new URL("https://web3mom6rest.eliaseriksson.eu/");
+export const apiURL = new URL("https://web3mom6rest.eliaseriksson.io/");
 
 export type Course = {
     id: number,
