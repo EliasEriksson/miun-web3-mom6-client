@@ -65,7 +65,7 @@ class Loader<T extends ContentType> {
 
         if (200 <= status && status < 300) {
             this.updatePageDetails(response);
-
+            console.log(this.courseCount, this.pageLimit)
             // determines if the paginator is needed or not
             if (this.courseCount > this.pageLimit) {
                 this.renderPaginator();
@@ -97,6 +97,8 @@ class Loader<T extends ContentType> {
             } else {
                 this.pageOffset = Math.floor(this.courseCount / this.pageLimit) * this.pageLimit;
             }
+        } else {
+            this.pageLimit = response.count;
         }
     }
 
